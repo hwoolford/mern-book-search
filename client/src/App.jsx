@@ -6,8 +6,8 @@ import {
   ApolloProvider,
   InMemoryCache,
   createHttpLink,
-  setContext,
 } from "@apollo/client";
+import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
   uri: "/graphql",

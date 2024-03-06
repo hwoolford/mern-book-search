@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import {
   Container,
   Card,
@@ -7,13 +6,14 @@ import {
   Col
 } from 'react-bootstrap';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_ME, REMOVE_BOOK } from '../utils/mutations'
+import { QUERY_ME } from '../utils/queries';
+import { REMOVE_BOOK } from '../utils/mutations'
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 
 const SavedBooks = () => {
-  const { loading, error, data } = useQuery(GET_ME);
+  const { loading, error, data } = useQuery(QUERY_ME);
   const [removeBookMutation] = useMutation(REMOVE_BOOK);
 
   if (loading) return <p>Loading...</p>;
