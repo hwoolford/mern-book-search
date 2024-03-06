@@ -44,7 +44,7 @@ const SignupForm = () => {
       // Handle successful signup
       const { token, user } = data.addUser;
       Auth.login(token);
-      console.log("User signed up successfully:", user);
+      console.log("User signed up successfully: ", user);
 
       // Reset form data
       setUserFormData({
