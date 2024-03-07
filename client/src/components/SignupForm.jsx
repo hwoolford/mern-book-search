@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Form, Button, Alert } from "react-bootstrap";
-
+import { useMutation } from "@apollo/client";
 import Auth from "../utils/auth";
 import { ADD_USER } from "../utils/mutations";
 
@@ -11,11 +11,12 @@ const SignupForm = () => {
     email: "",
     password: "",
   });
-  const [addUser, { error, data }] = useMutation(ADD_USER);
   // set state for form validation
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+
+  const [addUser] = useMutation(ADD_USER);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -27,6 +28,7 @@ const SignupForm = () => {
 
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
+
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
@@ -37,27 +39,23 @@ const SignupForm = () => {
         variables: { ...userFormData },
       });
 
-      if (!response.ok) {
-        throw new Error("something went wrong!");
-      }
-
       // Handle successful signup
       const { token, user } = data.addUser;
       Auth.login(token);
       console.log("User signed up successfully: ", user);
 
-      // Reset form data
       setUserFormData({
         username: "",
         email: "",
         password: "",
       });
+
+      // Reset form data
     } catch (err) {
       console.error("Error signing up:", err);
       setShowAlert(true);
     }
   };
-
   return (
     <>
       {/* This is needed for the validation functionality above */}
