@@ -61,6 +61,7 @@ const resolvers = {
         // Save the updated user object
         const updatedUser = await user.save();
         return updatedUser;
+        
       } catch (err) {
         throw new Error("Failed to save book");
       }
