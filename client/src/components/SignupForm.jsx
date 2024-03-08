@@ -25,6 +25,7 @@ const SignupForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    console.log(userFormData)
 
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
@@ -42,7 +43,9 @@ const SignupForm = () => {
       // Handle successful signup
       const { token, user } = data.addUser;
       Auth.login(token);
-      console.log("User signed up successfully: ", user);
+      // Auth.login(data.addUser.token);
+
+      console.log("User signed up successfully ", user);
 
       setUserFormData({
         username: "",
@@ -52,7 +55,7 @@ const SignupForm = () => {
 
       // Reset form data
     } catch (err) {
-      console.error("Error signing up:", err);
+      console.error("Error signing up - You went to catch:", err);
       setShowAlert(true);
     }
   };
