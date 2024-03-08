@@ -64,6 +64,15 @@ const SearchBooks = () => {
   const [saveBookMutation] = useMutation(SAVE_BOOK);
 
   const handleSaveBook = async (bookId) => {
+// Find the book with the given bookId in searchedBooks array
+const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+
+// If bookToSave is null or undefined, the book with the given bookId was not found
+if (!bookToSave) {
+  console.error(`Book with ID ${bookId} not found.`);
+  return;
+}
+
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -82,7 +91,7 @@ const SearchBooks = () => {
       const { data } = await saveBookMutation({
         variables: {
           input: {
-            bookId: bookId,
+            ...bookToSave, // Pass all properties of the book to save
           },
         },
         // Pass token in the request headers
