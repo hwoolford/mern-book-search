@@ -43,7 +43,7 @@ const LoginForm = () => {
       });
 
     } catch (err) {
-      console.error("Error logging in:: ", err);
+      console.error("Error logging in: ", err);
       setShowAlert(true);
     }
   };

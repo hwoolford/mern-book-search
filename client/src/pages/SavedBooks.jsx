@@ -1,28 +1,21 @@
-import {
-  Container,
-  Card,
-  Button,
-  Row,
-  Col
-} from 'react-bootstrap';
+/* eslint-disable react/no-unknown-property */
+/* eslint-disable react/jsx-key */
+import { useState } from 'react';
+import { Container, Card, Button, Row, Col } from 'react-bootstrap';
 import { useQuery, useMutation } from '@apollo/client';
-import { QUERY_ME } from '../utils/queries';
-import { REMOVE_BOOK } from '../utils/mutations'
+import { GET_ME } from '../utils/queries';
+import { REMOVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
-
 const SavedBooks = () => {
-  const { loading, error, data } = useQuery(QUERY_ME);
-  const [removeBookMutation] = useMutation(REMOVE_BOOK);
+  const [userData, setUserData] = useState({});
+  const { loading, error, data } = useQuery(GET_ME);
+  const [removeBookMutation] = useMutation(REMOVE_BOOK)
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  // const userData = data ? data.me : {};
 
-  // Access userData from the data object
-  const userData = data ? data.me : {};
-
-  // create function that accepts the book's mongo _id value as param and deletes the book from the database
+   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
@@ -31,26 +24,28 @@ const SavedBooks = () => {
     }
 
     try {
-      // Use the removeBookMutation instead of deleteBook function
-      const { data: { removeBook } } = await removeBookMutation({
-        variables: { bookId },
-        context: { headers: { authorization: `Bearer ${token}` } },
-      });
+      // Execute the removeBook mutation with the bookId
+     await removeBookMutation({ variables: { bookId }, });
 
-      // Update state with the returned user data after removing the book
-      setUserData(removeBook);
+      // Update userData with the result of the mutation
+      const updatedUserData = { ...data.me };
+      updatedUserData.savedBooks = updatedUserData.savedBooks.filter(book => book.bookId !== bookId);
 
-      // Upon success, remove book's id from localStorage
+      setUserData(updatedUserData);
+
+      
+      // upon success, remove book's id from localStorage
       removeBookId(bookId);
-     
     } catch (err) {
       console.error(err);
     }
   };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
-    return <h2>LOADING...</h2>;
+  if (loading) return <h2>Loading...</h2>;
+  if (error) {
+    console.error('Error fetching user data:', error);
+    return <h2>Error fetching user data</h2>; 
   }
 
   return (

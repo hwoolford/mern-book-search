@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { Container, Col, Form, Button, Card, Row } from "react-bootstrap";
 
 import Auth from "../utils/auth";
 import { searchGoogleBooks } from "../utils/API";
-import { saveBookIds, getSavedBookIds } from "../utils/localStorage";
+import { getSavedBookIds } from "../utils/localStorage";
 
 import { useMutation } from "@apollo/client";
 import { SAVE_BOOK } from "../utils/mutations";
@@ -20,7 +21,7 @@ const SearchBooks = () => {
   useEffect(() => {
     // Save savedBookIds to localStorage when the component unmounts
     return () => {
-      localStorage.setItem("saveBookIds", JSON.stringify(saveBookIds));
+      localStorage.setItem("savedBookIds", JSON.stringify(savedBookIds));
     };
   }, []); // Empty dependency array to ensure this effect runs only once (on mount) and cleans up on unmount
 
@@ -48,8 +49,9 @@ const SearchBooks = () => {
         description: book.volumeInfo.description,
         image: book.volumeInfo.imageLinks?.thumbnail || "",
       }));
-
+      console.log('search input: ', searchInput)
       setSearchedBooks(bookData);
+      console.log('bookData: ', bookData)
       setSearchInput("");
     } catch (err) {
       console.error(err);
@@ -58,7 +60,9 @@ const SearchBooks = () => {
 
   // create function to handle saving a book to our database
   const [saveBookMutation] = useMutation(SAVE_BOOK);
+  
   const handleSaveBook = async (bookId) => {
+    console.log('bookId: ', bookId)
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
     
@@ -68,19 +72,29 @@ const SearchBooks = () => {
       return;
     }
 
+    console.log('token: ', token)
+
     try {
       // Execute saveBookMutation with the bookId and token
       const { data } = await saveBookMutation({
-        variables: { bookId },
+        variables: {
+          input: {
+            bookId: bookId,
+          }
+        },
         // Pass token in the request headers
         context: { headers: { authorization: `Bearer ${token}` } }, 
       });
+      console.log('data: ', data)
+      console.log('bookId#2: ', bookId)
 
       // Check if book was successfully saved
       if (data && data.saveBook) {
         // Update state with the newly saved book ID
         setSavedBookIds([...savedBookIds, bookId]);
         console.log("Book saved successfully:", data.saveBook);
+      } else {
+        console.log("book didn't save")
       }
       
     } catch (err) {
