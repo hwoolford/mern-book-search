@@ -1,4 +1,4 @@
-const { User, Book } = require("../models");
+const { User } = require("../models");
 const {
   AuthenticationError,
   UserInputError,
@@ -65,25 +65,25 @@ const resolvers = {
         throw new Error("Failed to save book");
       }
     },
-    removeBook: async (parent, { bookId }, context) => {
+    removeBook: async (_, { bookId }, context) => {
       if (!context.user) {
         throw new AuthenticationError(
           "You must be logged in to perform this action"
         );
       }
       try {
-        // Find the user and remove the book from the savedBooks array
-        const user = await User.findByIdAndUpdate(
+        // Find the user and update the savedBooks array to remove the book
+        const updatedUser = await User.findByIdAndUpdate(
           context.user._id,
-          { $pull: { savedBooks: { _id: bookId } } },
+          { $pull: { savedBooks: { bookId } } },
           { new: true }
         );
 
-        if (!user) {
-          throw new Error("User not found");
+        if (!updatedUser) {
+          throw new Error("Updated user not found");
         }
 
-        return user;
+        return updatedUser;
       } catch (err) {
         throw new Error(`Failed to remove book: ${err.message}`);
       }
