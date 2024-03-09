@@ -61,7 +61,6 @@ const resolvers = {
         // Save the updated user object
         const updatedUser = await user.save();
         return updatedUser;
-        
       } catch (err) {
         throw new Error("Failed to save book");
       }
@@ -72,20 +71,21 @@ const resolvers = {
           "You must be logged in to perform this action"
         );
       }
-
       try {
-        // Remove the book from the Book collection
-        const book = await Book.findByIdAndDelete(bookId);
-        if (!book) {
-          throw new Error("Book not found");
+        // Find the user and remove the book from the savedBooks array
+        const user = await User.findByIdAndUpdate(
+          context.user._id,
+          { $pull: { savedBooks: { _id: bookId } } },
+          { new: true }
+        );
+
+        if (!user) {
+          throw new Error("User not found");
         }
-        // Remove the book's ID from the user's savedBooks array
-        await User.findByIdAndUpdate(context.user._id, {
-          $pull: { savedBooks: bookId },
-        });
-        return book;
+
+        return user;
       } catch (err) {
-        throw new Error("Failed to remove book");
+        throw new Error(`Failed to remove book: ${err.message}`);
       }
     },
   },

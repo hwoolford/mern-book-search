@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-key */
+
 /* eslint-disable react/no-unknown-property */
 
 import { useState, useEffect } from "react";
@@ -35,18 +36,19 @@ const SavedBooks = () => {
       // Execute the removeBook mutation with the bookId
       await removeBookMutation({ variables: { bookId } });
 
-      // Update userData with the result of the mutation
-      const updatedUserData = { ...data.me };
+      // Update userData with the result of the mutation using a callback function
+    setUserData(prevUserData => {
+      const updatedUserData = { ...prevUserData };
       updatedUserData.savedBooks = updatedUserData.savedBooks.filter(
         (book) => book.bookId !== bookId
       );
-
-      setUserData(updatedUserData);
-
+      return updatedUserData;
+    });
+    
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
     } catch (err) {
-      console.error(err);
+      console.error('Cannot do that!!', err);
     }
   };
 
@@ -59,7 +61,7 @@ const SavedBooks = () => {
 
   return (
     <>
-      <div fluid="true" className="text-light bg-dark p-5">
+      <div className="text-light bg-dark p-5" fluid="true">
         <Container>
           <h1>Viewing saved books!</h1>
         </Container>
@@ -77,8 +79,8 @@ const SavedBooks = () => {
             userData.savedBooks &&
             userData.savedBooks.map((book) => {
               return (
-                <Col md="4">
-                  <Card key={book.bookId} border="dark">
+                <Col key={book.bookId}  md="4">
+                  <Card border="dark">
                     {book.image ? (
                       <Card.Img
                         src={book.image}
