@@ -12,12 +12,20 @@ const app = express();
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: ({ req }) => {
+    // Get the user from the request using your authentication middleware
+    const user = getUser(req);
+
+    // Return the context object with the user data
+    return { user };
+  },
 });
 
 // Create a new instance of an Apollo server with the GraphQL schema
 const startApolloServer = async () => {
   await server.start();
 
+  // Apply middleware to parse JSON and URL-encoded bodies
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 

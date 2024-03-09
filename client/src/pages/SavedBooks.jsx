@@ -13,6 +13,8 @@ const SavedBooks = () => {
   const { loading, error, data } = useQuery(GET_ME);
   const [removeBookMutation] = useMutation(REMOVE_BOOK);
 
+  console.log("userData.savedBooks:", userData.savedBooks);
+
   // const userData = data ? data.me : {};
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
@@ -34,6 +36,14 @@ const SavedBooks = () => {
       );
 
       setUserData(updatedUserData);
+
+          // Update userData based on the current state
+    // setUserData((prevUserData) => ({
+    //   ...prevUserData,
+    //   savedBooks: prevUserData.savedBooks.filter(
+    //     (book) => book.bookId !== bookId
+    //   ),
+    // }));
 
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
