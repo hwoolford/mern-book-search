@@ -42,9 +42,43 @@ const LoginForm = () => {
         password: '',
       });
 
+       // Schedule token refresh
+       scheduleTokenRefresh();
+
     } catch (err) {
       console.error("Error logging in: ", err);
       setShowAlert(true);
+    }
+  };
+
+  const scheduleTokenRefresh = () => {
+    const tokenExpirationTime = Auth.getTokenExpirationTime();
+    const timeToRefresh = tokenExpirationTime - Date.now() - 300000; // Refresh 5 minutes before expiry
+    setTimeout(refreshToken, timeToRefresh);
+  };
+
+  const refreshToken = async () => {
+    try {
+      // Send request to refresh token
+      const response = await fetch('/refresh-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Auth.getToken()}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to refresh token');
+      }
+
+      const { token } = await response.json();
+      Auth.login(token);
+
+      // Schedule next token refresh
+      scheduleTokenRefresh();
+    } catch (error) {
+      console.error('Error refreshing token:', error);
     }
   };
 
